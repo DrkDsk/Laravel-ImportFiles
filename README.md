@@ -39,7 +39,7 @@ Método encargado de ejecutar la clase que importa el archivo
 
 Archivo encargado de la lectura e implementación de la inserción de los registros en la base de datos
 
-![Método encargado de ejecutar la clase que importa el archivo](https://i.imgur.com/9s5gp7O.png)
+![Método encargado de ejecutar la clase que importa el archivo](https://i.imgur.com/DBoeWqU.png)
 
 
 
