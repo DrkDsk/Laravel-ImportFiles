@@ -5,9 +5,6 @@ namespace App\Services;
 use App\Enums\TypeOfMedium;
 use App\Imports\OOHImport;
 use App\Imports\PrensaImport;
-use App\Imports\RadioImport;
-use App\Imports\RevistaImport;
-use App\Models\ReadedFile;
 use Maatwebsite\Excel\Facades\Excel;
 
 class ImporterService {
@@ -27,9 +24,7 @@ class ImporterService {
     public function getImport(string $origin, string $fileName)
     {
         $importOptionsOfOrigin = [
-            strtolower(TypeOfMedium::Revista->value) => new RevistaImport($fileName, $origin),
             strtolower(TypeOfMedium::OOH->value) => new OOHImport($fileName, $origin),
-            strtolower(TypeOfMedium::Radio->value) => new RadioImport($fileName, $origin),
             strtolower(TypeOfMedium::Prensa->value) => new PrensaImport($fileName, $origin)
         ];
 

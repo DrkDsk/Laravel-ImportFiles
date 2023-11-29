@@ -13,7 +13,6 @@ class Kernel extends ConsoleKernel
     protected function schedule(Schedule $schedule): void
     {
         $schedule->command('app:import-files-prensa-task')->everyMinute();
-        $schedule->command('app:import-files-revista-task')->everyMinute();
         $schedule->command('app:import-files-ooh-task')->everyMinute();
     }
 

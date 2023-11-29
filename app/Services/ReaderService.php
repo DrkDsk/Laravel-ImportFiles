@@ -5,6 +5,7 @@ namespace App\Services;
 use App\Exceptions\HeaderFileException;
 use App\Exceptions\IncorrectFileException;
 use App\Repositorys\ReadedFileRepository;
+use Maatwebsite\Excel\Validators\ValidationException;
 
 class ReaderService
 {
@@ -30,7 +31,7 @@ class ReaderService
             $import = $this->importerService->getImport($this->origin, $this->file_name);
             $this->importerService->import($import, $this->getFileStoragePath());
 
-        } catch (IncorrectFileException | HeaderFileException $exception) {
+        } catch (IncorrectFileException | HeaderFileException | ValidationException $exception) {
             $this->setExceptionToFile($exception->getMessage());
         }
     }
