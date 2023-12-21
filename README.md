@@ -17,7 +17,7 @@
 
 ## Plan de ejecución
 
-Las tareas programadas (task scheduling) están configuradas para que sean ejecutadas usando el gestor de proceosos "supervisor" de Linux.
+Las tareas programadas (task scheduling) están configuradas para que sean ejecutadas usando el gestor de procesos "supervisor" de Linux.
 
 
 ## Autores
