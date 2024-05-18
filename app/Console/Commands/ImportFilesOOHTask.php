@@ -2,12 +2,11 @@
 
 namespace App\Console\Commands;
 
-use App\Repositorys\ReadedFileRepository;
 use App\Services\ReaderService;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\Storage;
 
-class ImportFilesOohTask extends Command
+class ImportFilesOOHTask extends Command
 {
     /**
      * The name and signature of the console command.
@@ -23,18 +22,16 @@ class ImportFilesOohTask extends Command
      */
     protected $description = 'Command description';
     protected const ORIGIN = "ooh";
-    protected const MAIN_PATH = "files/" . SELF::ORIGIN . "/";
+    protected const MAIN_PATH = "files/" . ImportFilesOOHTask::ORIGIN . "/";
 
     /**
      * Execute the console command.
      */
-    public function handle(ReadedFileRepository $readedFileRepository) : void
+    public function handle(ReaderService $readerService) : void
     {
-        $allFiles = Storage::disk('public')->files(self::MAIN_PATH);
+        $allFiles = Storage::disk('public')->files(ImportFilesOOHTask::MAIN_PATH);
         foreach ($allFiles as $file) {
-            $fileName = str_replace(self::MAIN_PATH,"",$file);
-            $fileInDatabase = $readedFileRepository->getReadedFileByOrigin($fileName, SELF::ORIGIN);
-            is_null($fileInDatabase) && new ReaderService(strtoupper(SELF::ORIGIN), $fileName, $file);
+            $readerService->import( ImportFilesOOHTask::ORIGIN, ImportFilesOOHTask::MAIN_PATH, $file);
         }
     }
 }

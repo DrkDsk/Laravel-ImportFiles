@@ -23,14 +23,13 @@ class OOHImport implements ToModel, WithChunkReading, WithHeadingRow, WithEvents
 {
     use sanitizadorTrait;
     use RemembersRowNumber;
-    private string $file_name, $origin;
+    private string $file_name;
     private ReadedFile $readed_file;
     private GeneralFactory $generalFactory;
 
-    public function __construct(string $file_name, string $origin)
+    public function __construct(string $file_name)
     {
         $this->file_name = $file_name;
-        $this->origin    = $origin;
         $this->generalFactory = new GeneralFactory();
     }
 
@@ -81,12 +80,12 @@ class OOHImport implements ToModel, WithChunkReading, WithHeadingRow, WithEvents
                 BeforeImport::class => function (BeforeImport $beforeImport) {
                     $this->readed_file = ReadedFile::create([
                         'fileName' => $this->file_name,
-                        'origin'   => $this->origin,
+                        'origin'   => 'OOH',
                         'start'    => now()->format('Y-m-d H:i:s')
                     ]);
                 },
                 AfterImport::class => function (AfterImport $event) {
-                    AfterImportEvent::dispatch($this->readed_file, $this->file_name, $this->origin);
+                    AfterImportEvent::dispatch($this->readed_file, $this->file_name, 'OOH');
                 }
             ];
         } catch (\Throwable $e) {

@@ -9,31 +9,24 @@ use Maatwebsite\Excel\Facades\Excel;
 
 class ImporterService {
 
-    private string $typeOfMedium;
-
-    public function __construct(string $typeOfMedium) {
-        $this->typeOfMedium = strtolower($typeOfMedium);
-    }
-
-    public function storeFile(): void
+    public function storeFile(string $origin): void
     {
         $filename              = request()->file('file')->getClientOriginalName();
-        request()->file('file')->storeAs('files/' . $this->typeOfMedium, $filename, ['disk' => 'public']);
+        request()->file('file')->storeAs('files/' . $origin, $filename, ['disk' => 'public']);
     }
 
     public function getImport(string $origin, string $fileName)
     {
         $importOptionsOfOrigin = [
-            strtolower(TypeOfMedium::OOH->value) => new OOHImport($fileName, $origin),
-            strtolower(TypeOfMedium::Prensa->value) => new PrensaImport($fileName, $origin)
+            strtolower(TypeOfMedium::OOH->value) => new OOHImport($fileName),
+            strtolower(TypeOfMedium::Prensa->value) => new PrensaImport($fileName)
         ];
 
-        return $importOptionsOfOrigin[$this->typeOfMedium];
+        return $importOptionsOfOrigin[strtolower($origin)] ?? null;
     }
 
     public function import(object $import, string $fileStoragePath): void
     {
         Excel::import($import, $fileStoragePath);
     }
-
 }

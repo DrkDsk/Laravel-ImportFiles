@@ -4,48 +4,55 @@ namespace App\Services;
 
 use App\Exceptions\HeaderFileException;
 use App\Exceptions\IncorrectFileException;
+use App\Models\ReadedFile;
 use App\Repositorys\ReadedFileRepository;
 use Maatwebsite\Excel\Validators\ValidationException;
 
 class ReaderService
 {
-    private ImporterService $importerService;
-    private ReadedFileRepository $readedFileRepository;
-    private string $fileStoragePath,$origin,$typeOfMedium,$file_name;
 
-    public function __construct(string $typeOfMedium, string $fileName, $file)
+    public function __construct(
+        protected ReadedFileRepository $readedFileRepository,
+        protected ImporterService $importerService)
     {
-        $this->typeOfMedium = $typeOfMedium;
-        $this->origin       = strtolower($this->typeOfMedium);
-        $this->fileStoragePath = $file;
-        $this->file_name = $fileName;
 
-        $this->importerService = new ImporterService($this->typeOfMedium);
-        $this->readedFileRepository = new ReadedFileRepository();
-        $this->import();
     }
 
-    private function import(): void
+    public function import(string $origin, string $mainPath, $file): void
     {
-        try {
-            $import = $this->importerService->getImport($this->origin, $this->file_name);
-            $this->importerService->import($import, $this->getFileStoragePath());
+        $fileName = str_replace($mainPath,"", $file);
+        $fileInDatabase = $this->readedFileRepository->getReadedFileByOrigin($fileName, $origin);
 
-        } catch (IncorrectFileException | HeaderFileException | ValidationException $exception) {
-            $this->setExceptionToFile($exception->getMessage());
+        //if not exists the file in database, create a new register and process it
+        if (!$fileInDatabase) {
+
+            $newReadFileData = [
+                'fileName' => $fileName,
+                'origin' => $origin,
+                'start' => date('Y-m-d')
+            ];
+
+            $readFile = $this->readedFileRepository->createReadFile($newReadFileData);
+
+            try {
+                $typeImport = $this->importerService->getImport($origin, $fileName);
+                $this->importerService->import($typeImport, $this->getFileStoragePath($file));
+
+            } catch (IncorrectFileException | HeaderFileException | ValidationException $exception) {
+                $this->setExceptionToFile($readFile, $exception->getMessage());
+            }
         }
     }
 
-    private function setExceptionToFile(string $exceptionGetMessage): void
+    private function setExceptionToFile(ReadedFile $readFile, string $exceptionGetMessage): void
     {
-        $readedFile = $this->readedFileRepository->getReadedFile($this->file_name);
-        if ($readedFile) {
-            $readedFile->update(['exception' => $exceptionGetMessage]);
-        }
+        $readFile->update([
+            'exception' => $exceptionGetMessage
+        ]);
     }
 
-    private function getFileStoragePath(): string
+    private function getFileStoragePath($file): string
     {
-        return public_path("storage/" . $this->fileStoragePath);
+        return public_path("storage/" . $file);
     }
 }

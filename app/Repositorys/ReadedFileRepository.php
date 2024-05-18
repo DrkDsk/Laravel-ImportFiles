@@ -15,4 +15,9 @@ class ReadedFileRepository
     {
         return ReadedFile::where('fileName', $fileName)->first();
     }
+
+    public function createReadFile(array $data)
+    {
+        return ReadedFile::create($data);
+    }
 }
